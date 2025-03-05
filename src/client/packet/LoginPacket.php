@@ -34,7 +34,7 @@ use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 
 final class LoginPacket extends ProxyPacket
 {
-    public const NETWORK_ID = ProxyPacketIds::LOGIN;
+    public const int NETWORK_ID = ProxyPacketIds::LOGIN;
 
     public string $address;
     public int $port;

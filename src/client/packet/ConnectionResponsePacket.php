@@ -34,7 +34,7 @@ use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 
 final class ConnectionResponsePacket extends ProxyPacket
 {
-    public const NETWORK_ID = ProxyPacketIds::CONNECTION_RESPONSE;
+    public const int NETWORK_ID = ProxyPacketIds::CONNECTION_RESPONSE;
 
     public int $runtimeId;
     public int $uniqueId;

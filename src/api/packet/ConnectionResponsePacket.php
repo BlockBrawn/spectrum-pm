@@ -34,11 +34,11 @@ use pocketmine\utils\BinaryStream;
 
 final class ConnectionResponsePacket extends Packet
 {
-    public const PACKET_ID = PacketIds::CONNECTION_RESPONSE;
+    public const int PACKET_ID = PacketIds::CONNECTION_RESPONSE;
 
-    public const RESPONSE_SUCCESS = 0;
-    public const RESPONSE_UNAUTHORIZED = 1;
-    public const RESPONSE_FAIL = 2;
+    public const int RESPONSE_SUCCESS = 0;
+    public const int RESPONSE_UNAUTHORIZED = 1;
+    public const int RESPONSE_FAIL = 2;
 
     public int $response;
 

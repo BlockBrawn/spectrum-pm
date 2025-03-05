@@ -132,7 +132,7 @@ final class ProxyInterface implements NetworkInterface
             port: $server->getPort(),
         );
         $this->typeConverter = TypeConverter::getInstance();
-        $this->packetBroadcaster = new StandardPacketBroadcaster($server);
+        $this->packetBroadcaster = new StandardPacketBroadcaster($server, $this->typeConverter->getProtocolId());
         $this->entityEventBroadcaster = new StandardEntityEventBroadcaster($this->packetBroadcaster, $this->typeConverter);
         $bandwidthTracker = $server->getNetwork()->getBandwidthTracker();
         $this->plugin->getScheduler()->scheduleDelayedRepeatingTask(new ClosureTask(function () use ($bandwidthTracker): void {
@@ -156,7 +156,7 @@ final class ProxyInterface implements NetworkInterface
         $session = $this->sessions[$identifier] ?? null;
         try {
             if ($packet instanceof ProxyPacket) {
-                $packet->decode(PacketSerializer::decoder($buffer, 0));
+                $packet->decode(PacketSerializer::decoder($this->typeConverter->getProtocolId(), $buffer, 0));
                 match (true) {
                     $packet instanceof LoginPacket => $this->login($identifier, $packet->address, $packet->port),
                     $packet instanceof ConnectionRequestPacket && $session !== null => $this->connect($session, $identifier, $packet->address, $packet->token, $packet->clientData, $packet->identityData),
@@ -245,7 +245,7 @@ final class ProxyInterface implements NetworkInterface
             $this->manager->markLoginReceived($this);
         }, $session, $session)->call($session);
 
-        $event = new PlayerPreLoginEvent($playerInfo, $session->getIp(), $session->getPort(), $server->requiresAuthentication());
+        $event = new PlayerPreLoginEvent($playerInfo, $session, $server->requiresAuthentication());
 
         if ($server->getNetwork()->getValidConnectionCount() > $server->getMaxPlayers()) {
             $event->setKickFlag(PlayerPreLoginEvent::KICK_FLAG_SERVER_FULL, KnownTranslationFactory::disconnectionScreen_serverFull());
@@ -320,7 +320,7 @@ final class ProxyInterface implements NetworkInterface
 
     public function sendOutgoing(int $identifier, Packet $packet, ?int $receiptId): void
     {
-        $encoder = PacketSerializer::encoder();
+        $encoder = PacketSerializer::encoder($this->typeConverter->getProtocolId());
         $packet->encode($encoder);
         $this->sendOutgoingRaw($identifier, $encoder->getBuffer(), $receiptId);
     }

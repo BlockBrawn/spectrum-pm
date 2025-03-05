@@ -34,7 +34,7 @@ use pocketmine\utils\BinaryStream;
 
 final class KickPacket extends Packet
 {
-    public const PACKET_ID = PacketIds::KICK;
+    public const int PACKET_ID = PacketIds::KICK;
 
     public string $reason;
     public string $username;

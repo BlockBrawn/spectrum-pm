@@ -62,7 +62,7 @@ use const SOL_TCP;
 
 final class APIThread extends Thread
 {
-    private const PACKET_LENGTH_SIZE = 4;
+    private const int PACKET_LENGTH_SIZE = 4;
 
     private Socket $socket;
     private ThreadSafeArray $buffer;

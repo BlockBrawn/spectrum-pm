@@ -34,7 +34,7 @@ use pocketmine\utils\BinaryStream;
 
 final class ConnectionRequestPacket extends Packet
 {
-    public const PACKET_ID = PacketIds::CONNECTION_REQUEST;
+    public const int PACKET_ID = PacketIds::CONNECTION_REQUEST;
 
     public string $token;
 

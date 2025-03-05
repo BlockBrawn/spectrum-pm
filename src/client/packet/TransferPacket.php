@@ -35,7 +35,7 @@ use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 
 final class TransferPacket extends ProxyPacket implements ClientboundPacket
 {
-    public const NETWORK_ID = ProxyPacketIds::TRANSFER;
+    public const int NETWORK_ID = ProxyPacketIds::TRANSFER;
 
     public string $address;
 

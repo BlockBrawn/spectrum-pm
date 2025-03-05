@@ -34,7 +34,7 @@ use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 
 final class LatencyPacket extends ProxyPacket
 {
-    public const NETWORK_ID = ProxyPacketIds::LATENCY;
+    public const int NETWORK_ID = ProxyPacketIds::LATENCY;
 
     public int $latency;
     public int $timestamp;

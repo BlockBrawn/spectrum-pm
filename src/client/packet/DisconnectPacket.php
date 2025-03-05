@@ -34,7 +34,7 @@ use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 
 final class DisconnectPacket extends ProxyPacket
 {
-    public const NETWORK_ID = ProxyPacketIds::DISCONNECT;
+    public const int NETWORK_ID = ProxyPacketIds::DISCONNECT;
 
     public static function create(): DisconnectPacket
     {

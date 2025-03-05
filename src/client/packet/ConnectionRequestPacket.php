@@ -37,7 +37,7 @@ use const JSON_INVALID_UTF8_IGNORE;
 
 final class ConnectionRequestPacket extends ProxyPacket
 {
-    public const NETWORK_ID = ProxyPacketIds::CONNECTION_REQUEST;
+    public const int NETWORK_ID = ProxyPacketIds::CONNECTION_REQUEST;
 
     public string $address;
     public string $token;

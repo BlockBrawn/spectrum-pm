@@ -32,11 +32,11 @@ namespace cooldogedev\Spectrum\client\packet;
 
 interface ProxyPacketIds
 {
-    public const CONNECTION_REQUEST = 500;
-    public const CONNECTION_RESPONSE = 501;
-    public const LATENCY = 502;
-    public const TRANSFER = 503;
+    public const int CONNECTION_REQUEST = 500;
+    public const int CONNECTION_RESPONSE = 501;
+    public const int LATENCY = 502;
+    public const int TRANSFER = 503;
 
-    public const LOGIN = 504;
-    public const DISCONNECT = 505;
+    public const int LOGIN = 504;
+    public const int DISCONNECT = 505;
 }

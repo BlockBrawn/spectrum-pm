@@ -34,7 +34,7 @@ use pocketmine\utils\BinaryStream;
 
 final class TransferPacket extends Packet
 {
-    public const PACKET_ID = PacketIds::TRANSFER;
+    public const int PACKET_ID = PacketIds::TRANSFER;
 
     public string $address;
     public string $username;

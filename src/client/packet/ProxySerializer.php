@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace cooldogedev\Spectrum\client\packet;
 
+use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 use pocketmine\utils\Binary;
 use function substr;
@@ -38,7 +39,7 @@ final class ProxySerializer
 {
     public static function encode(int $identifier, ProxyPacket $packet): string
     {
-        $encoder = PacketSerializer::encoder();
+        $encoder = PacketSerializer::encoder(TypeConverter::getInstance()->getProtocolId());
         $encoder->putInt($identifier);
         $packet->encode($encoder);
         return $encoder->getBuffer();
