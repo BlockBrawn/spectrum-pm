@@ -37,6 +37,7 @@ use cooldogedev\Spectrum\network\ProxyInterface;
 use cooldogedev\Spectrum\util\ComposerRegisterAsyncTask;
 use pocketmine\event\EventPriority;
 use pocketmine\event\server\NetworkInterfaceRegisterEvent;
+use pocketmine\network\mcpe\encryption\EncryptionContext;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\login\AuthenticationData;
 use pocketmine\network\mcpe\raklib\RakLibInterface;
@@ -51,6 +52,7 @@ final class Spectrum extends PluginBase
 {
     private array $decode = [
 		ProxyPacketIds::CONNECTION_RESPONSE => true,
+		ProxyPacketIds::FLUSH => true,
 		ProxyPacketIds::LATENCY => true,
 		ProxyPacketIds::TRANSFER => true,
 
@@ -102,6 +104,7 @@ final class Spectrum extends PluginBase
 
     protected function onEnable(): void
     {
+		EncryptionContext::$ENABLED = false;
         if ($this->getConfig()->getNested("api.enabled"))  {
             $this->api = new APIThread(
                 logger: $this->getServer()->getLogger(),
