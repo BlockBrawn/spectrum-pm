@@ -102,7 +102,7 @@ final class ProxyInterface implements NetworkInterface
      */
     private array $sessions = [];
 
-    public function __construct(private readonly Spectrum $plugin, private readonly array $decode)
+    public function __construct(private readonly Spectrum $plugin)
     {
         $threadToMain = new ThreadSafeArray();
         $mainToThread = new ThreadSafeArray();
@@ -159,7 +159,7 @@ final class ProxyInterface implements NetworkInterface
                 $packet->decode(PacketSerializer::decoder($this->typeConverter->getProtocolId(), $buffer, 0));
                 match (true) {
                     $packet instanceof LoginPacket => $this->login($identifier, $packet->address, $packet->port),
-                    $packet instanceof ConnectionRequestPacket && $session !== null => $this->connect($session, $identifier, $packet->address, $packet->token, $packet->clientData, $packet->identityData),
+                    $packet instanceof ConnectionRequestPacket && $session !== null => $this->connect($session, $identifier, $packet->address, $packet->protocolID, $packet->clientData, $packet->identityData, $packet->cache),
                     $packet instanceof LatencyPacket && $session !== null => $this->latency($session, $identifier, $packet->latency, $packet->timestamp),
                     $packet instanceof DisconnectPacket => $this->disconnect($identifier, false),
                     default => null,
@@ -197,18 +197,13 @@ final class ProxyInterface implements NetworkInterface
         $this->sessions[$identifier] = $session;
     }
 
-    private function connect(NetworkSession $session, int $identifier, string $address, string $token, array $clientData, array $identityData): void
+    private function connect(NetworkSession $session, int $identifier, string $address, int $protocolID, array $clientData, array $identityData, string $cache): void
     {
         [$ip, $port] = explode(":", $address);
         $server = $this->plugin->getServer();
         $clientData = JsonUtils::map($clientData, new ClientData());
         $identityData = JsonUtils::map($identityData, new AuthenticationData());
         if ($clientData === null || $identityData === null) {
-            $session->disconnectWithError(KnownTranslationFactory::pocketmine_disconnect_error_authentication());
-            return;
-        }
-
-        if ($this->plugin->authenticator !== null && !($this->plugin->authenticator)($identityData, $token)) {
             $session->disconnectWithError(KnownTranslationFactory::pocketmine_disconnect_error_authentication());
             return;
         }
@@ -276,6 +271,7 @@ final class ProxyInterface implements NetworkInterface
             return;
         }
 
+        $this->plugin->setCache($playerInfo->getXuid(), $cache, $protocolID);
         Closure::bind(function () use ($entityId): void {
             $onPlayerCreated = $this->onPlayerCreated(...);
             $onFail = $this->disconnectWithError(...);
@@ -291,7 +287,7 @@ final class ProxyInterface implements NetworkInterface
                         $onPlayerCreated($this);
                     }, $player, $player)->call($player);
                 },
-                fn () => $onFail("Failed to create player")
+                static fn () => $onFail("Failed to create player")
             );
         }, $session, $session)->call($session);
     }
@@ -313,6 +309,7 @@ final class ProxyInterface implements NetworkInterface
 
         unset($this->sessions[$identifier]);
         $session->onClientDisconnect($reason);
+        $this->plugin->deleteCache($session->getPlayerInfo()->getXuid());
         if ($notifyThread) {
             $this->sendOutgoing($identifier, DisconnectPacket::create(), null);
         }
@@ -329,7 +326,7 @@ final class ProxyInterface implements NetworkInterface
     {
 		$offset = 0;
 		$packetID = Binary::readUnsignedVarInt($packet, $offset) & DataPacket::PID_MASK;
-        $this->mainToThread->write(Binary::writeInt($identifier) . Binary::writeBool($this->decode[$packetID] ?? false) . $packet);
+        $this->mainToThread->write(Binary::writeInt($identifier) . Binary::writeBool($this->plugin->shouldPacketDecode($packetID)) . $packet);
         $this->sentBytes += strlen($packet);
         @socket_write($this->threadNotifier, "\00");
         if ($receiptId !== null && isset($this->sessions[$identifier])) {
