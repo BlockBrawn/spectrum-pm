@@ -30,33 +30,29 @@ declare(strict_types=1);
 
 namespace cooldogedev\Spectrum\client\packet;
 
-use pocketmine\network\mcpe\protocol\PacketPool as PMPacketPool;
+use pocketmine\network\mcpe\protocol\ClientboundPacket;
+use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 
-final class ProxyPacketPool extends PMPacketPool
+final class UpdateCachePacket extends ProxyPacket implements ClientboundPacket
 {
-    private static ?ProxyPacketPool $_instance = null;
+	public const int NETWORK_ID = ProxyPacketIds::UPDATE_CACHE;
 
-    public function __construct()
-    {
-        parent::__construct();
+	public string $cache;
 
-        $this->pool->setSize($this->pool->getSize() + 8);
-        $this->registerPacket(new ConnectionRequestPacket());
-        $this->registerPacket(new ConnectionResponsePacket());
-        $this->registerPacket(new FlushPacket());
-        $this->registerPacket(new LatencyPacket());
-        $this->registerPacket(new TransferPacket());
-        $this->registerPacket(new UpdateCachePacket());
-        $this->registerPacket(new DisconnectPacket());
-        $this->registerPacket(new LoginPacket());
-    }
+	public static function create(string $cache): ConnectionRequestPacket
+	{
+		$packet = new ConnectionRequestPacket();
+		$packet->cache = $cache;
+		return $packet;
+	}
 
-    public static function getInstance(): ProxyPacketPool
-    {
-        if (ProxyPacketPool::$_instance === null) {
-            ProxyPacketPool::$_instance = new ProxyPacketPool();
-        }
+	public function decodePayload(PacketSerializer $in): void
+	{
+		$this->cache = $in->getString();
+	}
 
-        return ProxyPacketPool::$_instance;
-    }
+	public function encodePayload(PacketSerializer $out): void
+	{
+		$out->putString($this->cache);
+	}
 }

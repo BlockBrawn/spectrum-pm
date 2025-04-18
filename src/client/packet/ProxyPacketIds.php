@@ -37,7 +37,8 @@ interface ProxyPacketIds
     public const int FLUSH = 502;
     public const int LATENCY = 503;
     public const int TRANSFER = 504;
+    public const int UPDATE_CACHE = 505;
 
-    public const int LOGIN = 505;
-    public const int DISCONNECT = 506;
+    public const int LOGIN = 506;
+    public const int DISCONNECT = 507;
 }
